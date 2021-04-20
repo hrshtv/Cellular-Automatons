@@ -1,9 +1,9 @@
 /*
-    Description: Conway's Game of Life, implemented in FLTK
+    Description: Wireworld Automaton, implemented in FLTK
     Author: Harshit Varma
 
     Instructions:
-    - Click to add/remove cells
+    - Click to change state of cells
     - Drag mouse to add a series of chains
     - Use the right arrow key to transition to the next state/generation, keep it pressed for an "animation effect"
     - Press spacebar to reset to the empty state
@@ -18,7 +18,7 @@
 #include <FL/Fl_Box.H>
 #include <FL/fl_draw.H>
 
-#include "ConwayCell.h"
+#include "Wireworld.h"
 #include "Config.h"
 #include "Helpers.h"
 
@@ -29,12 +29,12 @@ const int R = 75;
 const int C = 75;
 const int CELL_SIZE = 10;
 
-ConwayCell* world[R][C];
+Wireworld* world[R][C];
 
 void initWorld(){
     for (int i = 0; i < R; i++)
         for (int j = 0; j < C; j++)
-            world[i][j] = new ConwayCell(CELL_SIZE*i, CELL_SIZE*j, CELL_SIZE, CELL_SIZE);
+            world[i][j] = new Wireworld(CELL_SIZE*i, CELL_SIZE*j, CELL_SIZE, CELL_SIZE);
 }
 
 void addConfig(Config *c){
@@ -53,13 +53,15 @@ void printWorld(){
     }
 }
 
-int nAlive(int i, int j){
+int nHeads(int i, int j){
     // Returns the number of alive neighbours of a cell at (i, j)
     int n_a = 0;
-    for (int r = -1; r <= 1; r++)
-        for (int c = -1; c <= 1; c++)
-            n_a += world[i + r][j + c]->state;
-    n_a -= world[i][j]->state;
+    for (int r = -1; r <= 1; r++){
+        for (int c = -1; c <= 1; c++){
+            if (!(r == i && c == j) && world[i + r][j + c]->state == 1)
+                n_a++;
+        }
+    }
     return n_a;
 }
 
@@ -72,17 +74,19 @@ void updateWorld()
     for (int i = 1; i < R-1; i++){
         for (int j = 1; j < C-1; j++){
 
-            int n_a = nAlive(i, j);
+            int n_a = nHeads(i, j);
 
             /* Rules: */
 
-            // Death: Underpopulation and Overpopulation
-            if ((world[i][j]->state == 1) && (n_a < 2 || n_a > 3))
-                next_grid[i][j] = 0;
-            // Birth
-            else if ((world[i][j]->state == 0) && (n_a == 3))
+            // head -> tail
+            if (world[i][j]->state == 1)
+                next_grid[i][j] = 2;
+            // teil -> conductor
+            else if (world[i][j]->state == 2)
+                next_grid[i][j] = 3;
+            // conductor -> head
+            else if ((world[i][j]->state == 3) && (n_a == 1 || n_a == 2))
                 next_grid[i][j] = 1;
-            // *life*
             else
                 next_grid[i][j] = world[i][j]->state;
 
@@ -100,7 +104,7 @@ void updateWorld()
 void reset(){
     for (int i = 0; i < R; i++)
         for (int j = 0; j < C; j++)
-            world[i][j]->updateState(0);
+            world[i][j]->empty();
 }
 
 class CustomWindow : public Fl_Window
@@ -142,16 +146,11 @@ class CustomWindow : public Fl_Window
 int main(){
 
     // Create the main window
-    Fl_Window* window = new CustomWindow(R*CELL_SIZE, C*CELL_SIZE, "Conway's Game of Life");
+    Fl_Window* window = new CustomWindow(R*CELL_SIZE, C*CELL_SIZE, "Wireworld");
     window->color(FL_BLACK);
-
-    // Initial world config
-    Config* conf = new Gosper();
-    conf->init();
 
     // Initialize the game 
     initWorld();
-    addConfig(conf);
 
     // Start the game
     window->show();
