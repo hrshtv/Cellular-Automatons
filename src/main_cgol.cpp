@@ -5,7 +5,7 @@
     Instructions:
     - Click to add/remove cells
     - Drag mouse to add a series of chains
-    - Use the right arrow key to transition to the next state/generation
+    - Use the right arrow key to transition to the next state/generation, keep it pressed for an "animation effect"
     - Press spacebar to reset to the empty state
     - ESC to quit
 
@@ -18,6 +18,7 @@
 #include <FL/Fl_Box.H>
 #include <FL/fl_draw.H>
 
+#include "Cell.h"
 #include "Config.h"
 #include "Helpers.h"
 
@@ -28,71 +29,14 @@ const int R = 75;
 const int C = 75;
 const int CELL_SIZE = 10;
 
-/* The GUI */
-class Cell : public Fl_Box
-{
-    protected:
-    int x, y, w, h;
-
-    public:
-
-    int state; // 0: dead, 1:alive
-
-    Cell(int x, int y, int w, int h, int state) : Fl_Box (x, y, w, h, "") {
-
-        this->x = x;
-        this->y = y;
-        this->w = w;
-        this->h = h;
-
-        this->box(FL_BORDER_BOX);
-
-        this->state = state;
-        this->updateState(state);
-
-    }
-    
-    virtual void birth(){
-        this->state = 1;
-        this->color(FL_WHITE);
-        this->redraw();
-    }
-
-    virtual void death(){
-        this->state = 0;
-        this->color(FL_BLACK);
-        this->redraw();
-    }
-
-    virtual void flip(){
-        if (state == 0)
-            this->birth();
-        else
-            this->death();
-    }
-
-    virtual void updateState(int s){
-        if (s == 0)
-            this->death();
-        else
-            this->birth(); 
-    }
-
-    virtual int handle(int e){
-        return 1;
-    }
-
-};
-
-Cell* world[R][C]; // GUI world of cells, each cell is either alive or dead
+ConwayCell* world[R][C];
 
 void initWorld(){
     for (int i = 0; i < R; i++)
         for (int j = 0; j < C; j++)
-            world[i][j] = new Cell(CELL_SIZE*i, CELL_SIZE*j, CELL_SIZE, CELL_SIZE, 0);
+            world[i][j] = new ConwayCell(CELL_SIZE*i, CELL_SIZE*j, CELL_SIZE, CELL_SIZE);
 }
 
-// works
 void addConfig(Config *c){
     for (int i = 0; i < c->size(); i++)
         for (int j = 0; j < c->size(); j++)
@@ -109,8 +53,7 @@ void printWorld(){
     }
 }
 
-int nAlive(int i, int j)
-{
+int nAlive(int i, int j){
     // Returns the number of alive neighbours of a cell at (i, j)
     int n_a = 0;
     for (int r = -1; r <= 1; r++)
@@ -152,7 +95,6 @@ void updateWorld()
             world[i][j]->updateState(next_grid[i][j]);
         }
     }
-
 }
 
 void reset(){
@@ -185,16 +127,11 @@ class CustomWindow : public Fl_Window
 
         }
 
-        else if (e == FL_PUSH){
+        else if (e == FL_PUSH || e == FL_DRAG){
             int i = Fl::event_x() / CELL_SIZE;
             int j = Fl::event_y() / CELL_SIZE;
-            world[i][j]->flip();
-        }
-
-        else if (e == FL_DRAG){
-            int i = Fl::event_x() / CELL_SIZE;
-            int j = Fl::event_y() / CELL_SIZE;
-            world[i][j]->birth();
+            if ((i >= 0) && (i < R) and (j >= 0) and (j < C))
+                world[i][j]->handle(e);
         }
 
         return 1;
@@ -212,8 +149,8 @@ int main(){
     Config* conf = new Gosper();
     conf->init();
 
-    // Initialize the game
-    initWorld();   
+    // Initialize the game 
+    initWorld();
     addConfig(conf);
 
     // Start the game
