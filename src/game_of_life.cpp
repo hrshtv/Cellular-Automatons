@@ -17,23 +17,19 @@
 #include <FL/Fl_Window.H>
 #include <FL/Fl_Box.H>
 #include <FL/fl_draw.H>
-#include "config.cpp"
+
+#include "Config.h"
+#include "Helpers.h"
 
 using namespace std;
 
 // Size of the world
 const int R = 75;
 const int C = 75;
-
 const int CELL_SIZE = 10;
 
 int grid[R][C] = {0}; // Global grid used for implementing the logic (1:Alive, 0:Dead)
  
-template<typename T>
-void print(T s){
-    cout << s << endl;
-}
-
 /* The GUI */
 class Cell : public Fl_Box
 {
@@ -88,23 +84,11 @@ class Cell : public Fl_Box
 
 Cell* world[R][C]; // GUI grid of cells, each cell is either alive or dead
 
-char* int2CharStar(int x)
+void initGrid(Config *c)
 {
-    // Converts int to char*
-    char *c = new char[3]; // At max 3 chars: "16\0" 
-    sprintf(c, "%d", x);
-    return c;
-}
-
-void initGrid()
-{
-    // Initialize the grid with pre-defined live cells (optional)
-    Gosper gun;
-    for (int i = 0; i < gun.size; i++){
-        for (int j = 0; j < gun.size; j++){
-            // Two gosper guns:
-            grid[i][j] = gun.data[i][j];
-            grid[R-i-1][C-j-1] = gun.data[i][j];
+    for (int i = 0; i < c->size(); i++){
+        for (int j = 0; j < c->size(); j++){
+            grid[i][j] = c->data[i][j];
         }
     }
 }
@@ -237,8 +221,12 @@ int main(){
     Fl_Window* window = new CustomWindow(R*CELL_SIZE, C*CELL_SIZE, "Conway's Game of Life");
     window->color(FL_BLACK);
 
-    // Initialize    
-    initGrid();
+    // Initial Config
+    Config* conf = new Gosper();
+    conf->init();
+
+    // Initialize the game   
+    initGrid(conf);
     initWorld();
     updateWorld();
 
@@ -247,7 +235,7 @@ int main(){
 
     int status = Fl::run();
 
-    cout << "Exiting ...\n";
+    print("Exiting...");
 
     return status;
 
