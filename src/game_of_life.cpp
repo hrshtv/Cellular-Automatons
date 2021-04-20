@@ -28,18 +28,18 @@ const int R = 75;
 const int C = 75;
 const int CELL_SIZE = 10;
 
-int grid[R][C] = {0}; // Global grid used for implementing the logic (1:Alive, 0:Dead)
- 
 /* The GUI */
 class Cell : public Fl_Box
 {
     protected:
     int x, y, w, h;
-    int state; // 0: dead, 1:alive
 
     public:
 
-    Cell(int x, int y, int w, int h) : Fl_Box (x, y, w, h, "") {
+    int state; // 0: dead, 1:alive
+
+    Cell(int x, int y, int w, int h, int state) : Fl_Box (x, y, w, h, "") {
+
         this->x = x;
         this->y = y;
         this->w = w;
@@ -47,27 +47,21 @@ class Cell : public Fl_Box
 
         this->box(FL_BORDER_BOX);
 
-        this->state = 0;
-        this->color(FL_BLACK);
+        this->state = state;
+        this->updateState(state);
 
     }
     
     virtual void birth(){
         this->state = 1;
-
         this->color(FL_WHITE);
         this->redraw();
-
-        grid[x/CELL_SIZE][y/CELL_SIZE] = 1;
     }
 
     virtual void death(){
         this->state = 0;
-
         this->color(FL_BLACK);
         this->redraw();
-
-        grid[x/CELL_SIZE][y/CELL_SIZE] = 0;
     }
 
     virtual void flip(){
@@ -77,26 +71,39 @@ class Cell : public Fl_Box
             this->death();
     }
 
+    virtual void updateState(int s){
+        if (s == 0)
+            this->death();
+        else
+            this->birth(); 
+    }
+
     virtual int handle(int e){
         return 1;
     }
+
 };
 
-Cell* world[R][C]; // GUI grid of cells, each cell is either alive or dead
+Cell* world[R][C]; // GUI world of cells, each cell is either alive or dead
 
-void initGrid(Config *c)
-{
-    for (int i = 0; i < c->size(); i++){
-        for (int j = 0; j < c->size(); j++){
-            grid[i][j] = c->data[i][j];
-        }
-    }
+void initWorld(){
+    for (int i = 0; i < R; i++)
+        for (int j = 0; j < C; j++)
+            world[i][j] = new Cell(CELL_SIZE*i, CELL_SIZE*j, CELL_SIZE, CELL_SIZE, 0);
 }
 
-void printGrid(){
-    for (int i = 1; i < R-1; i++){
-        for (int j = 1; j < C-1; j++){
-            cout << grid[i][j] << " ";
+// works
+void addConfig(Config *c){
+    for (int i = 0; i < c->size(); i++)
+        for (int j = 0; j < c->size(); j++)
+            world[i][j]->updateState(c->data[i][j]);
+}
+
+void printWorld(){
+    // Prints the current state of all cells
+    for (int i = 0; i < R; i++){
+        for (int j = 0; j < C; j++){
+            cout << world[i][j]->state << " ";
         }
         cout << endl;
     }
@@ -108,16 +115,16 @@ int nAlive(int i, int j)
     int n_a = 0;
     for (int r = -1; r <= 1; r++)
         for (int c = -1; c <= 1; c++)
-            n_a += grid[i + r][j + c];
-    n_a -= grid[i][j];
+            n_a += world[i + r][j + c]->state;
+    n_a -= world[i][j]->state;
     return n_a;
 }
 
-void updateGrid()
+void updateWorld()
 {
     // Updates the world based on the current state
 
-    int next_grid[R][C];
+    int next_grid[R][C]; // Temporary storage for the next generation
     
     for (int i = 1; i < R-1; i++){
         for (int j = 1; j < C-1; j++){
@@ -127,50 +134,31 @@ void updateGrid()
             /* Rules: */
 
             // Death: Underpopulation and Overpopulation
-            if ((grid[i][j] == 1) && (n_a < 2 || n_a > 3))
+            if ((world[i][j]->state == 1) && (n_a < 2 || n_a > 3))
                 next_grid[i][j] = 0;
             // Birth
-            else if ((grid[i][j] == 0) && (n_a == 3))
+            else if ((world[i][j]->state == 0) && (n_a == 3))
                 next_grid[i][j] = 1;
             // *life*
             else
-                next_grid[i][j] = grid[i][j];
+                next_grid[i][j] = world[i][j]->state;
 
         }
     }
 
     // Update
-    for (int i = 1; i < R-1; i++)
-        for (int j = 1; j < C-1; j++)
-            grid[i][j] = next_grid[i][j];
-}
-
-void initWorld(){
-    // Initializes the GUI world
-    for (int i = 0; i < R; i++){
-        for (int j = 0; j < C; j++){
-            world[i][j] = new Cell(CELL_SIZE*i, CELL_SIZE*j, CELL_SIZE, CELL_SIZE);
+    for (int i = 1; i < R-1; i++){
+        for (int j = 1; j < C-1; j++){
+            world[i][j]->updateState(next_grid[i][j]);
         }
     }
-}
 
-void updateWorld(){
-    // Updates the GUI based on the current state of the grid
-    for (int i = 0; i < R; i++){
-        for (int j = 0; j < C; j++){
-            if (grid[i][j] == 1)
-                world[i][j]->birth();
-            else
-                world[i][j]->death();
-        }
-    }
 }
 
 void reset(){
     for (int i = 0; i < R; i++)
         for (int j = 0; j < C; j++)
-            grid[i][j] = 0;
-    updateWorld();
+            world[i][j]->updateState(0);
 }
 
 class CustomWindow : public Fl_Window
@@ -183,7 +171,6 @@ class CustomWindow : public Fl_Window
         if (e == FL_KEYDOWN){
 
             if (Fl::event_key(FL_Right)){
-                updateGrid();
                 updateWorld();
             }
 
@@ -221,15 +208,15 @@ int main(){
     Fl_Window* window = new CustomWindow(R*CELL_SIZE, C*CELL_SIZE, "Conway's Game of Life");
     window->color(FL_BLACK);
 
-    // Initial Config
+    // Initial world config
     Config* conf = new Gosper();
     conf->init();
 
-    // Initialize the game   
-    initGrid(conf);
-    initWorld();
-    updateWorld();
+    // Initialize the game
+    initWorld();   
+    addConfig(conf);
 
+    // Start the game
     window->show();
     window->end();
 
