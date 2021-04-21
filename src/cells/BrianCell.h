@@ -1,6 +1,6 @@
 #include "Cell.h"
 
-/* Brian's Brain */
+/* Brian's Brain : https://en.wikipedia.org/wiki/Brian%27s_Brain */
 
 class BrianCell : public Cell {
 
@@ -8,11 +8,12 @@ class BrianCell : public Cell {
 
     BrianCell(int x, int y, int w, int h);
 
-    void  on();
+    // 3 states
+    void on();
     void dying();
     void off();
 
-    void flip(); // circular flip
+    void flip();
 
     virtual void updateState(int s);
 
@@ -41,12 +42,15 @@ void BrianCell::off(){
 }
 
 void BrianCell::flip(){
+    // Circularly flips the state (-1 -> 1 -> 0 -> -1)
     if (state == -1)
         this->on();
+    else if (state == 1)
+        this->dying();
     else if (state == 0)
         this->off();
     else
-        this->dying();
+        return;
 }
 
 void BrianCell::updateState(int s){
@@ -54,8 +58,10 @@ void BrianCell::updateState(int s){
         this->off();
     else if (s == 0)
         this->dying(); 
-    else
+    else if (s == 1)
         this->on();
+    else
+        return;
 }
 
 int BrianCell::handle(int e){

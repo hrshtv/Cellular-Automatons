@@ -1,6 +1,8 @@
 #include <FL/Fl_Box.H>
 #include <FL/fl_draw.H>
 
+/* Abstract class that describes the nature of a cell in a cellular automaton */
+
 class Cell : public Fl_Box {
 
     protected:

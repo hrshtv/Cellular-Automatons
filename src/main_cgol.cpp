@@ -18,8 +18,9 @@
 #include <FL/Fl_Box.H>
 #include <FL/fl_draw.H>
 
-#include "ConwayCell.h"
-#include "Config.h"
+#include "cells/ConwayCell.h"
+#include "configs/Config.h"
+#include "configs/Gosper.h"
 #include "Helpers.h"
 
 using namespace std;

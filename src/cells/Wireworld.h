@@ -1,6 +1,6 @@
 #include "Cell.h"
 
-/* Wireworld */
+/* Wireworld Cell : https://en.wikipedia.org/wiki/Wireworld */
 
 class Wireworld : public Cell {
 
@@ -8,12 +8,13 @@ class Wireworld : public Cell {
 
     Wireworld(int x, int y, int w, int h);
 
+    // 4 states
     void empty();
     void head();
     void tail();
     void conductor();
 
-    void flip(); // circular flip
+    void flip();
 
     virtual void updateState(int s);
 
@@ -54,8 +55,10 @@ void Wireworld::flip(){
         this->tail();
     else if (state == 2)
         this->head();
-    else
+    else if (state == 1)
         this->empty();
+    else
+        return;
 }
 
 void Wireworld::updateState(int s){
@@ -65,8 +68,10 @@ void Wireworld::updateState(int s){
         this->head(); 
     else if (s == 2)
         this->tail(); 
-    else
+    else if (s == 3)
         this->conductor();
+    else
+        return;
 }
 
 int Wireworld::handle(int e){

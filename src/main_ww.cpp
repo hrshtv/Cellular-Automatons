@@ -18,8 +18,8 @@
 #include <FL/Fl_Box.H>
 #include <FL/fl_draw.H>
 
-#include "Wireworld.h"
-#include "Config.h"
+#include "cells/Wireworld.h"
+#include "configs/Config.h"
 #include "Helpers.h"
 
 using namespace std;

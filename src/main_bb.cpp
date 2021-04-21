@@ -18,8 +18,8 @@
 #include <FL/Fl_Box.H>
 #include <FL/fl_draw.H>
 
-#include "BrianCell.h"
-#include "Config.h"
+#include "cells/BrianCell.h"
+#include "configs/Config.h"
 #include "Helpers.h"
 
 using namespace std;

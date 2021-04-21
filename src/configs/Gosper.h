@@ -1,26 +1,3 @@
-#include <iostream>
-#include <vector>
-using namespace std;
-
-class Config{
-
-    protected:
-    int n;
-
-    public:
-
-    vector<vector<int>> data;
-
-    virtual void init() = 0;
-
-    Config(){}
-
-    int size(){
-        return n;
-    }
-
-};
-
 class Gosper : public Config {
 
     public:
