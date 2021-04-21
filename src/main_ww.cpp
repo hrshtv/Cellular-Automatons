@@ -4,8 +4,8 @@
 
     Instructions:
     - Click to change state of cells
-    - Drag mouse to add a series of chains
-    - Use the right arrow key to transition to the next state/generation, keep it pressed for an "animation effect"
+    - Drag mouse to add a series of cells
+    - Use the right arrow key to transition to the next state/generation, keep it pressed for an animation effect
     - Press spacebar to reset to the empty state
     - ESC to quit
 

@@ -2,7 +2,7 @@
 #include <vector>
 using namespace std;
 
-/* Abstract class that specifies the initial configuration of the world */
+/* Abstract class that stores a particular configuration of the world */
 
 class Config{
 

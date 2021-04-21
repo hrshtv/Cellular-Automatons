@@ -4,8 +4,8 @@
 
     Instructions:
     - Click to add/remove cells
-    - Drag mouse to add a series of chains
-    - Use the right arrow key to transition to the next state/generation, keep it pressed for an "animation effect"
+    - Drag mouse to add a series of cells
+    - Use the right arrow key to transition to the next state/generation, keep it pressed for an animation effect
     - Press spacebar to reset to the empty state
     - ESC to quit
 
@@ -33,12 +33,14 @@ const int CELL_SIZE = 10;
 ConwayCell* world[R][C];
 
 void initWorld(){
+    // Initialize the world with all black cells
     for (int i = 0; i < R; i++)
         for (int j = 0; j < C; j++)
             world[i][j] = new ConwayCell(CELL_SIZE*i, CELL_SIZE*j, CELL_SIZE, CELL_SIZE);
 }
 
 void addConfig(Config *c){
+    // Add the config c to the world
     for (int i = 0; i < c->size(); i++)
         for (int j = 0; j < c->size(); j++)
             world[i][j]->updateState(c->data[i][j]);
@@ -59,14 +61,13 @@ int nAlive(int i, int j){
     int n_a = 0;
     for (int r = -1; r <= 1; r++)
         for (int c = -1; c <= 1; c++)
-            n_a += world[i + r][j + c]->state;
-    n_a -= world[i][j]->state;
+            if (!(r == i and c == j))
+                n_a += world[i + r][j + c]->state;
     return n_a;
 }
 
-void updateWorld()
-{
-    // Updates the world based on the current state
+void updateWorld(){
+    // Updates all states based on the rules of the world
 
     int next_grid[R][C]; // Temporary storage for the next generation
     
@@ -83,7 +84,6 @@ void updateWorld()
             // Birth
             else if ((world[i][j]->state == 0) && (n_a == 3))
                 next_grid[i][j] = 1;
-            // *life*
             else
                 next_grid[i][j] = world[i][j]->state;
 
@@ -99,6 +99,7 @@ void updateWorld()
 }
 
 void reset(){
+    // Resets the world
     for (int i = 0; i < R; i++)
         for (int j = 0; j < C; j++)
             world[i][j]->updateState(0);
@@ -152,6 +153,7 @@ int main(){
 
     // Initialize the game 
     initWorld();
+    // Add the gosper gun config
     addConfig(conf);
 
     // Start the game
