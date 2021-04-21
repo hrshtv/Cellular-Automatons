@@ -7,7 +7,7 @@ using namespace std;
 class Config{
 
     protected:
-    int n;
+    int nr, nc;
 
     public:
 
@@ -17,8 +17,12 @@ class Config{
 
     Config(){}
 
-    int size(){
-        return n;
+    int sizeR(){
+        return nr;
+    }
+
+    int sizeC(){
+        return nc;
     }
 
 };

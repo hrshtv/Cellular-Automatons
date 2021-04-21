@@ -15,18 +15,20 @@
 #include <iostream>
 #include <FL/Fl.H>
 #include <FL/Fl_Window.H>
-#include <FL/Fl_Box.H>
-#include <FL/fl_draw.H>
 
 #include "Helpers.h"
-#include "World.h"
+#include "worlds/BrianWorld.h"
 
-class CustomWindow : public Fl_Window{
+const int R = 75;
+const int C = 75;
+const int CELL_SIZE = 10;
 
-    World *world;
+class CustomWindow : public Fl_Window {
+
+    BrianWorld *world;
 
     public:
-    CustomWindow(int w, int h, const char *title, World *world) : Fl_Window(w, h, title) {
+    CustomWindow(int w, int h, const char *title, BrianWorld *world) : Fl_Window(w, h, title) {
         this->world = world;
     };
 
@@ -64,7 +66,7 @@ class CustomWindow : public Fl_Window{
 
 int main(){
 
-    World b;
+    BrianWorld b(R, C, CELL_SIZE);
 
     // Create the main window
     Fl_Window* window = new CustomWindow(R*CELL_SIZE, C*CELL_SIZE, "Brian's Brain", &b);

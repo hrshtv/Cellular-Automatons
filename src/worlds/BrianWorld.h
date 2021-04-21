@@ -3,23 +3,37 @@
 #include <FL/Fl_Box.H>
 #include <FL/fl_draw.H>
 
-#include "cells/BrianCell.h"
-#include "configs/Config.h"
+#include "../cells/BrianCell.h"
+#include "../configs/Config.h"
 
 using namespace std;
 
-// Size of the world
-const int R = 75;
-const int C = 75;
-const int CELL_SIZE = 10;
+class BrianWorld{
 
-class World{
+    protected:
+    int R, C, CELL_SIZE;
 
     public:
 
-    BrianCell* world[R][C];
+    vector<vector<BrianCell*>> world;
 
-    World(){};
+    BrianWorld(int R, int C, int CELL_SIZE){
+
+        this->R = R;
+        this->C = C;
+        this->CELL_SIZE = CELL_SIZE;
+
+        world.resize(R);
+        for (int i = 0; i < R; i++)
+            world[i].resize(C);
+
+    }
+
+    ~BrianWorld(){
+        for (int i = 0; i < R; i++)
+            for (int j = 0; j < C; j++)
+                delete world[i][j];
+    }
 
     void init(){
         for (int i = 0; i < R; i++)
@@ -28,8 +42,8 @@ class World{
     }
 
     void addConfig(Config *c){
-        for (int i = 0; i < c->size(); i++)
-            for (int j = 0; j < c->size(); j++)
+        for (int i = 0; i < c->sizeR(); i++)
+            for (int j = 0; j < c->sizeC(); j++)
                 world[i][j]->updateState(c->data[i][j]);
     }
 
@@ -48,7 +62,7 @@ class World{
         int n_a = 0;
         for (int r = -1; r <= 1; r++){
             for (int c = -1; c <= 1; c++){
-                if (!(r == i && c == j) && world[i + r][j + c]->state == 1)
+                if (!(r == 0 && c == 0) && world[i + r][j + c]->state == 1)
                     n_a++;
             }
         }

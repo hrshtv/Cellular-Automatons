@@ -2,11 +2,11 @@
 
 /* Wireworld Cell : https://en.wikipedia.org/wiki/Wireworld */
 
-class Wireworld : public Cell {
+class WireworldCell : public Cell {
 
     public:
 
-    Wireworld(int x, int y, int w, int h);
+    WireworldCell(int x, int y, int w, int h);
 
     // 4 states
     void empty();
@@ -22,33 +22,33 @@ class Wireworld : public Cell {
 
 };
 
-Wireworld::Wireworld(int x, int y, int w, int h) : Cell(x, y, w, h) {}
+WireworldCell::WireworldCell(int x, int y, int w, int h) : Cell(x, y, w, h) {}
 
-void Wireworld::empty(){
+void WireworldCell::empty(){
     this->state = 0;
     this->color(FL_BLACK);
     this->redraw();
 }
 
-void Wireworld::head(){
+void WireworldCell::head(){
     this->state = 1;
     this->color(FL_GREEN);
     this->redraw();
 }
 
-void Wireworld::tail(){
+void WireworldCell::tail(){
     this->state = 2;
     this->color(FL_RED);
     this->redraw();
 }
 
-void Wireworld::conductor(){
+void WireworldCell::conductor(){
     this->state = 3;
     this->color(FL_YELLOW);
     this->redraw();
 }
 
-void Wireworld::flip(){
+void WireworldCell::flip(){
     if (state == 0)
         this->conductor();
     else if (state == 3)
@@ -61,7 +61,7 @@ void Wireworld::flip(){
         return;
 }
 
-void Wireworld::updateState(int s){
+void WireworldCell::updateState(int s){
     if (s == 0)
         this->empty();
     else if (s == 1)
@@ -74,7 +74,7 @@ void Wireworld::updateState(int s){
         return;
 }
 
-int Wireworld::handle(int e){
+int WireworldCell::handle(int e){
 
     if (e == FL_PUSH)
         this->flip();
