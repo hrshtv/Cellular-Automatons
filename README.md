@@ -36,3 +36,7 @@ bash run.sh <filename>
   - `BrianWorld.h` : Implementation of Brian's Brain
   - `ConwayWorld.h` : Implementation of the Conway's Game of Life
   - `WireworldWorld.h` : Implementation of Wireworld
+
+---
+
+*(This was done as a lab assignment for CS154: Abstractions and Paradigms for Programming Lab, Spring 2021, IIT Bombay)*
