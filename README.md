@@ -6,7 +6,7 @@
   <img src="demo/wireworld.gif" width="32%"></img>
 </p>
 
-[Brian's Brain](https://en.wikipedia.org/wiki/Brian%27s_Brain), [Conway's Game of Life](https://en.wikipedia.org/wiki/Conway%27s_Game_of_Life), and [Wireworld](https://en.wikipedia.org/wiki/Wireworld) have been implemented.  
+Contains implementations of [Brian's Brain](https://en.wikipedia.org/wiki/Brian%27s_Brain), [Conway's Game of Life](https://en.wikipedia.org/wiki/Conway%27s_Game_of_Life), and [Wireworld](https://en.wikipedia.org/wiki/Wireworld). 
 
 ## Usage:
 
